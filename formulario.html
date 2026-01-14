@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Jugadores - Disponibilidad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00cc00;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ff00;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            color: #00ff00;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        select option {
+            background: #0a0a0a;
+            color: #00ff00;
+        }
+
+        .disponibilidad-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #00cc00;
+            border-radius: 10px;
+        }
+
+        .disponibilidad-section h2 {
+            color: #00ff00;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .day-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border: 1px solid #00ff00;
+            border-radius: 8px;
+        }
+
+        .day-title {
+            font-weight: bold;
+            color: #00ff00;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            display: block;
+        }
+
+        .horarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #00ff00;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+            color: #00cc00;
+            font-size: 1em;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #00ff00;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .submit-btn:hover {
+            background: #00cc00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .mensaje {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .mensaje.exito {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .mensaje.error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff0000;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #00ff00;
+            margin-top: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .horarios {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TOPTEN PADEL</h1>
+        <h2 style="text-align: center; color: #00ff00; margin-bottom: 10px; font-size: 1.5em;">Registro de Jugadores</h2>
+        <p class="subtitle">Completa tus datos y disponibilidad horaria</p>
+
+        <form id="formularioJugadores">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan Pérez">
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono / WhatsApp *</label>
+                <input type="tel" id="telefono" name="telefono" required placeholder="Ej: 1123456789">
+            </div>
+
+            <div class="form-group">
+                <label for="genero">Género *</label>
+                <select id="genero" name="genero" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="Caballero">Caballero</option>
+                    <option value="Dama">Dama</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="posicion">Posición de Juego *</label>
+                <select id="posicion" name="posicion" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="Drive">Drive</option>
+                    <option value="Revés">Revés</option>
+                    <option value="Ambos">Ambos (Drive y Revés)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="categoria">Categoría *</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option value="3ra">3ra</option>
+                    <option value="4ta">4ta</option>
+                    <option value="5ta">5ta</option>
+                    <option value="6ta">6ta</option>
+                    <option value="7ma">7ma</option>
+                    <option value="8va">8va</option>
+                </select>
+            </div>
+
+            <div class="disponibilidad-section">
+                <h2>📅 Disponibilidad Horaria</h2>
+                <p style="text-align: center; color: #00cc00; margin-bottom: 20px;">Marca los horarios en los que puedes jugar</p>
+
+                <div class="day-group">
+                    <span class="day-title">Lunes</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_1630" name="lunes" value="16:30">
+                            <label for="lunes_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_1800" name="lunes" value="18:00">
+                            <label for="lunes_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_1930" name="lunes" value="19:30">
+                            <label for="lunes_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lunes_2100" name="lunes" value="21:00">
+                            <label for="lunes_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-group">
+                    <span class="day-title">Martes</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_1630" name="martes" value="16:30">
+                            <label for="martes_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_1800" name="martes" value="18:00">
+                            <label for="martes_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_1930" name="martes" value="19:30">
+                            <label for="martes_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="martes_2100" name="martes" value="21:00">
+                            <label for="martes_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-group">
+                    <span class="day-title">Miércoles</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_1630" name="miercoles" value="16:30">
+                            <label for="miercoles_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_1800" name="miercoles" value="18:00">
+                            <label for="miercoles_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_1930" name="miercoles" value="19:30">
+                            <label for="miercoles_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="miercoles_2100" name="miercoles" value="21:00">
+                            <label for="miercoles_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-group">
+                    <span class="day-title">Jueves</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_1630" name="jueves" value="16:30">
+                            <label for="jueves_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_1800" name="jueves" value="18:00">
+                            <label for="jueves_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_1930" name="jueves" value="19:30">
+                            <label for="jueves_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="jueves_2100" name="jueves" value="21:00">
+                            <label for="jueves_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-group">
+                    <span class="day-title">Viernes</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_1630" name="viernes" value="16:30">
+                            <label for="viernes_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_1800" name="viernes" value="18:00">
+                            <label for="viernes_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_1930" name="viernes" value="19:30">
+                            <label for="viernes_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="viernes_2100" name="viernes" value="21:00">
+                            <label for="viernes_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-group">
+                    <span class="day-title">Sábado</span>
+                    <div class="horarios">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sabado_1630" name="sabado" value="16:30">
+                            <label for="sabado_1630">16:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sabado_1800" name="sabado" value="18:00">
+                            <label for="sabado_1800">18:00</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sabado_1930" name="sabado" value="19:30">
+                            <label for="sabado_1930">19:30</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sabado_2100" name="sabado" value="21:00">
+                            <label for="sabado_2100">21:00</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar Registro</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <p>⏳ Enviando datos...</p>
+        </div>
+
+        <div class="mensaje" id="mensaje"></div>
+    </div>
+
+    <script>
+        // IMPORTANTE: Reemplaza esta URL con la URL de tu Google Apps Script
+        const SCRIPT_URL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI';
+
+        document.getElementById('formularioJugadores').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Validar que la URL del script esté configurada
+            if (SCRIPT_URL === 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
+                mostrarMensaje('error', '⚠️ Error: Debes configurar la URL de Google Apps Script primero. Lee las instrucciones en INSTRUCCIONES.txt');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const mensaje = document.getElementById('mensaje');
+            const submitBtn = document.querySelector('.submit-btn');
+
+            // Mostrar loading
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+            mensaje.style.display = 'none';
+
+            // Recopilar datos del formulario
+            const datos = {
+                nombre: document.getElementById('nombre').value,
+                telefono: document.getElementById('telefono').value,
+                genero: document.getElementById('genero').value,
+                posicion: document.getElementById('posicion').value,
+                categoria: document.getElementById('categoria').value,
+                disponibilidad: {}
+            };
+
+            // Recopilar disponibilidad por día
+            const dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+            dias.forEach(dia => {
+                const checkboxes = document.querySelectorAll(`input[name="${dia}"]:checked`);
+                const horarios = Array.from(checkboxes).map(cb => cb.value);
+                datos.disponibilidad[dia] = horarios.join(', ') || 'No disponible';
+            });
+
+            // Agregar fecha de registro
+            datos.fecha = new Date().toLocaleString('es-AR');
+
+            try {
+                // Enviar datos a Google Sheets
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                // Con no-cors no podemos leer la respuesta, pero si no hay error, asumimos éxito
+                mostrarMensaje('exito', '✅ ¡Registro exitoso! Tus datos han sido guardados correctamente.');
+                document.getElementById('formularioJugadores').reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('error', '❌ Error al enviar los datos. Por favor intenta nuevamente.');
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function mostrarMensaje(tipo, texto) {
+            const mensaje = document.getElementById('mensaje');
+            mensaje.className = `mensaje ${tipo}`;
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+
+            // Ocultar mensaje después de 5 segundos si es éxito
+            if (tipo === 'exito') {
+                setTimeout(() => {
+                    mensaje.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
